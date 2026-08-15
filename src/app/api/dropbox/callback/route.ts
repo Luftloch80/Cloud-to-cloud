@@ -4,6 +4,7 @@ import {
   getDropboxAccount,
 } from "@/lib/dropbox";
 import { updateSession } from "@/lib/session";
+import { appUrl } from "@/lib/url";
 import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
 
   if (error) {
     return NextResponse.redirect(
-      new URL(`/connect?step=dropbox&error=${encodeURIComponent(error)}`, request.url),
+      appUrl(request, `/connect?step=dropbox&error=${encodeURIComponent(error)}`),
     );
   }
 
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
 
   if (!code || !state || !expected || state !== expected) {
     return NextResponse.redirect(
-      new URL("/connect?step=dropbox&error=invalid_state", request.url),
+      appUrl(request, "/connect?step=dropbox&error=invalid_state"),
     );
   }
 
@@ -45,11 +46,11 @@ export async function GET(request: Request) {
       },
     });
 
-    return NextResponse.redirect(new URL("/folder", request.url));
+    return NextResponse.redirect(appUrl(request, "/folder"));
   } catch (err) {
     const message = err instanceof Error ? err.message : "oauth_failed";
     return NextResponse.redirect(
-      new URL(`/connect?step=dropbox&error=${encodeURIComponent(message)}`, request.url),
+      appUrl(request, `/connect?step=dropbox&error=${encodeURIComponent(message)}`),
     );
   }
 }

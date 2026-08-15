@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { dropboxConfigured, getDropboxAuthUrl } from "@/lib/dropbox";
 import { isDemoModeAllowed, readSession, updateSession } from "@/lib/session";
+import { appUrl } from "@/lib/url";
 import { randomBytes } from "crypto";
 import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
   const session = await readSession();
   if (!session?.apple) {
-    return NextResponse.redirect(new URL("/connect?step=apple", request.url));
+    return NextResponse.redirect(appUrl(request, "/connect?step=apple"));
   }
 
   const url = new URL(request.url);
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
       },
     });
 
-    return NextResponse.redirect(new URL("/folder", request.url));
+    return NextResponse.redirect(appUrl(request, "/folder"));
   }
 
   const state = randomBytes(16).toString("hex");
